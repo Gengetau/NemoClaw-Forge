@@ -69,13 +69,24 @@ class ScoutMaster:
         
         # Build the prompt for the Brain
         report_data = {
-            "github_trending": [{"name": r["full_name"], "desc": r["description"]} for r in gh_results],
+            "github_trending": [{"name": r["full_name"], "url": r["html_url"], "desc": r["description"]} for r in gh_results],
             "upwork_notifications": upwork_jobs
         }
         
         prompt = (
-            f"You are the Scout Intelligence Officer. Analyze the following data and provide a concise, "
-            f"high-value summary of what the user should act on today.\n\nData:\n{json.dumps(report_data, indent=2)}"
+            "你是一名资深的侦察情报官。请分析以下数据，并为用户提供一份高价值的中文情报简报。\n"
+            "请务必使用 Markdown 格式，且确保内容专业、干练。\n\n"
+            "报告结构如下：\n"
+            "### 🚀 GitHub 热门趋势 (近7天)\n"
+            "列出前 5 个项目：\n"
+            "- **项目名称** (带链接: [name](url))\n"
+            "- **技术栈** (根据项目描述预测)\n"
+            "- **中文概要** (一句话说明该项目的核心用途)\n\n"
+            "### 💼 Upwork 赚钱机会\n"
+            "列出前 5 个最相关的职位：\n"
+            "- **职位名称**\n"
+            "- **中文概要** (核心技术要求与交付目标)\n\n"
+            f"原始数据：\n{json.dumps(report_data, indent=2, ensure_ascii=False)}"
         )
         
         return await self.brain.execute(prompt)
