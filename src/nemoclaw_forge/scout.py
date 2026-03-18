@@ -38,15 +38,32 @@ class EmailScout:
         # We pass a function that can execute 'gog' commands
         self.exec_cmd = gog_command_func
 
-    async def fetch_upwork_jobs(self) -> List[str]:
-        # Simple proxy: search for unread Upwork notifications
-        cmd = "GOG_KEYRING_PASSWORD=openclaw gog gmail search 'is:unread from:upwork newer_than:1d' --limit 5 --select 'subject'"
+    async def fetch_upwork_jobs(self) -> List[Dict[str, str]]:
+        # Search for unread Upwork notifications
+        cmd_search = "GOG_KEYRING_PASSWORD=openclaw gog gmail search 'is:unread from:upwork newer_than:1d' --limit 5 --select 'id,subject'"
         try:
-            result = await self.exec_cmd(cmd)
-            # Basic parsing of gog output
+            result = await self.exec_cmd(cmd_search)
             lines = result.splitlines()
-            jobs = [line.strip() for line in lines if "New job:" in line]
-            return jobs
+            jobs_meta = []
+            for line in lines:
+                if "New job:" in line:
+                    parts = line.split(None, 1)
+                    if len(parts) >= 1:
+                        msg_id = parts[0]
+                        subject = line.split("New job:")[1].strip() if "New job:" in line else line
+                        jobs_meta.append({"id": msg_id, "subject": subject})
+            
+            detailed_jobs = []
+            for job in jobs_meta:
+                # Get the snippet/body for each job to provide context for the summary
+                cmd_get = f"GOG_KEYRING_PASSWORD=openclaw gog gmail get {job['id']} --select 'snippet'"
+                body = await self.exec_cmd(cmd_get)
+                # Extract the overview part if possible, otherwise just use the body
+                detailed_jobs.append({
+                    "title": job['subject'],
+                    "context": body[:2000] # Limit context size
+                })
+            return detailed_jobs
         except Exception as e:
             logger.error(f"EmailScout Error: {e}")
             return []
@@ -70,7 +87,7 @@ class ScoutMaster:
         # Build the prompt for the Brain
         report_data = {
             "github_trending": [{"name": r["full_name"], "url": r["html_url"], "desc": r["description"]} for r in gh_results],
-            "upwork_notifications": upwork_jobs
+            "upwork_opportunities": upwork_jobs
         }
         
         prompt = (
