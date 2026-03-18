@@ -5,6 +5,8 @@ from typing import List, Dict, Any
 import aiohttp
 from .brain import Brain
 
+from datetime import datetime, timedelta
+
 logger = logging.getLogger(__name__)
 
 class GitHubScout:
@@ -13,8 +15,12 @@ class GitHubScout:
         self.token = token
         self.base_url = "https://api.github.com"
 
-    async def fetch_trending(self, query: str = "language:python", sort: str = "stars") -> List[Dict[str, Any]]:
-        url = f"{self.base_url}/search/repositories?q={query}&sort={sort}&order=desc"
+    async def fetch_trending(self, days: int = 7, language: str = "python") -> List[Dict[str, Any]]:
+        # Calculate date for 'recently created' to simulate trending
+        date_threshold = (datetime.now() - timedelta(days=days)).strftime('%Y-%m-%d')
+        query = f"language:{language} created:>{date_threshold}"
+        url = f"{self.base_url}/search/repositories?q={query}&sort=stars&order=desc"
+        
         headers = {"Authorization": f"token {self.token}", "Accept": "application/vnd.github.v3+json"}
         
         async with aiohttp.ClientSession() as session:
