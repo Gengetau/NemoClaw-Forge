@@ -52,6 +52,11 @@ async def run_scout_task():
     print(report)
     print("---------------------------------\n")
 
+async def run_api_server():
+    import uvicorn
+    # Use 0.0.0.0 to allow Tailscale access
+    uvicorn.run("nemoclaw_forge.api:app", host="0.0.0.0", port=8000, reload=False)
+
 def main():
     parser = argparse.ArgumentParser(description="NemoClaw-Forge CLI")
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -63,6 +68,8 @@ def main():
     
     scout_parser = subparsers.add_parser("scout", help="Run a manual scout mission")
     
+    api_parser = subparsers.add_parser("api", help="Start the Moonlight Ledger API server")
+    
     args = parser.parse_args()
     
     if args.command == "forge":
@@ -71,6 +78,8 @@ def main():
         asyncio.run(run_claw(args.id))
     elif args.command == "scout":
         asyncio.run(run_scout_task())
+    elif args.command == "api":
+        asyncio.run(run_api_server())
 
 if __name__ == "__main__":
     main()
