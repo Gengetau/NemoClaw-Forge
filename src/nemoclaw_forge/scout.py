@@ -39,8 +39,8 @@ class EmailScout:
         self.exec_cmd = gog_command_func
 
     async def fetch_upwork_jobs(self) -> List[Dict[str, str]]:
-        # Search for unread Upwork notifications
-        cmd_search = "GOG_KEYRING_PASSWORD=openclaw gog gmail search 'is:unread from:upwork newer_than:1d' --limit 5 --select 'id,subject'"
+        # Search for recent Upwork notifications (regardless of read status)
+        cmd_search = "GOG_KEYRING_PASSWORD=openclaw gog gmail search 'from:upwork newer_than:1d' --limit 5 --select 'id,subject'"
         try:
             result = await self.exec_cmd(cmd_search)
             lines = result.splitlines()
