@@ -1,10 +1,16 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from pydantic import BaseModel
 from typing import List, Optional
+import os
 from .ledger import LedgerManager
 
 app = FastAPI(title="NemoClaw Moonlight Ledger API")
 ledger = LedgerManager()
+
+# Define paths
+STATIC_DIR = os.path.join(os.path.dirname(__file__), "static")
 
 class ExpenseCreate(BaseModel):
     item: str
@@ -37,6 +43,11 @@ async def list_expenses():
 async def get_summary():
     return ledger.get_summary()
 
+# Root endpoint serves the Moonlight UI
 @app.get("/")
-async def health():
-    return {"status": "Moonlight Ledger API is active", "version": "0.1.0"}
+async def serve_ui():
+    return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+
+# Mount static files (if we add CSS/JS files later)
+if os.path.exists(STATIC_DIR):
+    app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
