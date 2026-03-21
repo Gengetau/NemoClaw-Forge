@@ -52,7 +52,7 @@ async def run_scout_task():
     print(report)
     print("---------------------------------\n")
 
-async def run_api_server():
+def run_api_server():
     import uvicorn
     # Use 0.0.0.0 to allow Tailscale access
     uvicorn.run("nemoclaw_forge.api:app", host="0.0.0.0", port=8000, reload=False)
@@ -79,7 +79,7 @@ def main():
     elif args.command == "scout":
         asyncio.run(run_scout_task())
     elif args.command == "api":
-        asyncio.run(run_api_server())
+        run_api_server()
 
 if __name__ == "__main__":
     main()
