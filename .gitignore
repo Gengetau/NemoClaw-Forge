@@ -1,6 +1,12 @@
 .env
 venv/
+.venv/
 __pycache__/
 *.pyc
 .pytest_cache/
 *.log
+.coverage
+*.db
+*.sqlite
+*.sqlite3
+reports/

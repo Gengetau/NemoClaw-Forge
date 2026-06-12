@@ -91,19 +91,19 @@ class ScoutMaster:
         }
         
         prompt = (
-            "你是一名资深的侦察情报官。请分析以下数据，并为用户提供一份高价值的中文情报简报。\n"
-            "请务必使用 Markdown 格式，且确保内容专业、干练。\n\n"
-            "报告结构如下：\n"
-            "### 🚀 GitHub 热门趋势 (近7天)\n"
-            "列出前 5 个项目：\n"
-            "- **项目名称** (带链接: [name](url))\n"
-            "- **技术栈** (根据项目描述预测)\n"
-            "- **中文概要** (一句话说明该项目的核心用途)\n\n"
-            "### 💼 Upwork 赚钱机会\n"
-            "列出前 5 个最相关的职位：\n"
-            "- **职位名称**\n"
-            "- **中文概要** (核心技术要求与交付目标)\n\n"
-            f"原始数据：\n{json.dumps(report_data, indent=2, ensure_ascii=False)}"
+            "You are a senior technical intelligence analyst. Review the data below "
+            "and produce a concise, high-signal Markdown brief in English.\n\n"
+            "Use this structure:\n"
+            "### GitHub Trending Repositories (Last 7 Days)\n"
+            "List up to 5 repositories:\n"
+            "- **Project name** with a link\n"
+            "- **Likely technology stack** inferred from the description\n"
+            "- **One-sentence summary** of the core use case\n\n"
+            "### Upwork Opportunities\n"
+            "List up to 5 relevant jobs:\n"
+            "- **Job title**\n"
+            "- **One-sentence summary** of technical requirements and delivery goal\n\n"
+            f"Raw data:\n{json.dumps(report_data, indent=2, ensure_ascii=False)}"
         )
         
         return await self.brain.execute(prompt)
